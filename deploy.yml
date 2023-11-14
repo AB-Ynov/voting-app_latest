@@ -1,0 +1,30 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+
+    - name: Install dependencies
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - python
+        - python-pip
+        - docker.io
+
+    - name: Install Docker Compose
+      pip:
+        name: docker-compose
+
+    - name: Clone the voting app repository
+      git:
+        repo: https://github.com/AB-Ynov/voting-app.git
+        dest: /opt/voting-app
+      become_user: AB-Ynov
+
+    - name: Bootstrap Python in the app directory
+      command: python3 -m venv /opt/voting-app/venv
+      become_user: AB-Ynov
